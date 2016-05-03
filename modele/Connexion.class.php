@@ -4,8 +4,8 @@ namespace modele;
 use \PDO;
 use \PDOException;
 
-define('DSN', 'mysql:host=localhost;dbname=festival');
-define('USER', 'festival');
+define('DSN', 'mysql:host=localhost;dbname=mabel_festival');
+define('USER', 'mabel_festival');
 define('MDP', 'secret');
 
 class Connexion {
