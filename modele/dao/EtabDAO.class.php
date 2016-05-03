@@ -1,31 +1,32 @@
 <?php
 
 namespace modele\dao;
+
 use modele\Connexion;
 use modele\metier\Etablissement;
 use modele\dao\DAO;
 use \PDO;
 
 class EtabDAO implements DAO {
-    
+
     public static function enregistrementVersObjet($enreg) {
         $retour = new Etablissement($enreg['id'], $enreg['nom'], $enreg['adresseRue'], $enreg['codePostal'], $enreg['ville'], $enreg['tel'], $enreg['adresseElectronique'], $enreg['type'], $enreg['civiliteResponsable'], $enreg['nomResponsable'], $enreg['prenomResponsable']);
-        return $retour;        
+        return $retour;
     }
 
     public static function objetVersEnregistrement($objetMetier) {
         $retour = array(
-            ':id' => $objetMetier->getId(),
-            ':nom' => $objetMetier->getNom(),
-            ':adresseRue' => $objetMetier->getAdresseRue(),
-            ':codePostal' => $objetMetier->getCodePostal(),
-            ':ville' => $objetMetier->getVille(),
-            ':tel' => $objetMetier->getTel(),
-            ':adresseElectronique' => $objetMetier->getAdresseElectronique(),
-            ':type' => $objetMetier->getType(),
-            ':civiliteResponsable' => $objetMetier->getCiviliteResponsable(),
-            ':nomResponsable' => $objetMetier->getNomResponsable(),
-            ':prenomResponsable' => $objetMetier->getPrenomResponsable()
+            $objetMetier->getId(),
+            $objetMetier->getNom(),
+            $objetMetier->getAdresseRue(),
+            $objetMetier->getCodePostal(),
+            $objetMetier->getVille(),
+            $objetMetier->getTel(),
+            $objetMetier->getAdresseElectronique(),
+            $objetMetier->getType(),
+            $objetMetier->getCiviliteResponsable(),
+            $objetMetier->getNomResponsable(),
+            $objetMetier->getPrenomResponsable()
         );
         return $retour;
     }
@@ -36,7 +37,7 @@ class EtabDAO implements DAO {
         $sql = "SELECT * FROM Etablissement";
         try {
             // préparer la requête PDO
-            $queryPrepare = Connexion::getPdo()->prepare($sql);
+            $queryPrepare = Connexion::connecter()->prepare($sql);
             // exécuter la requête PDO
             if ($queryPrepare->execute()) {
                 // si la requête réussit :
@@ -62,7 +63,7 @@ class EtabDAO implements DAO {
             // Requête textuelle paramétrée (le paramètre est symbolisé par un ?)
             $sql = "SELECT * FROM Etablissement WHERE id = ?";
             // préparer la requête PDO
-            $queryPrepare = Connexion::getPdo()->prepare($sql);
+            $queryPrepare = Connexion::connecter()->prepare($sql);
             // exécuter la requête avec les valeurs des paramètres (il n'y en a qu'un ici) dans un tableau
             if ($queryPrepare->execute(array($valeurClePrimaire))) {
                 // si la requête réussit :
@@ -72,7 +73,7 @@ class EtabDAO implements DAO {
                 $retour = self::enregistrementVersObjet($enregistrement);
             }
         } catch (PDOException $e) {
-            echo get_class() . ' - '.__METHOD__ . ' : '. $e->getMessage();
+            echo get_class() . ' - ' . __METHOD__ . ' : ' . $e->getMessage();
         }
         return $retour;
     }
@@ -81,33 +82,40 @@ class EtabDAO implements DAO {
         try {
             $objetRef = self::objetVersEnregistrement($objetMetier);
             // Requête textuelle paramétrée (le paramètre est symbolisé par un ?)
-            $sql = "INSERT INTO Etablissement (id, nom, adresseRue, codePostal, ville, tel, adresseElectronique, type, civiliteResponsable, nomResponsable, prenomResponsable) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO etablissement (id, nom, adresseRue, codePostal, ville, tel, adresseElectronique, type, civiliteResponsable, nomResponsable, prenomResponsable) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             // préparer la requête PDO
-            $queryPrepare = Connexion::getPdo()->prepare($sql);
+            $queryPrepare = Connexion::connecter()->prepare($sql);
             // exécuter la requête avec les valeurs des paramètres dans un tableau
             $queryPrepare->execute($objetRef);
             $retour = "INSERT Réussi !";
         } catch (PDOException $e) {
-            echo get_class() . ' - '.__METHOD__ . ' : '. $e->getMessage();
+            echo get_class() . ' - ' . __METHOD__ . ' : ' . $e->getMessage();
         }
         return $retour;
     }
-    
+
     public static function update($idMetier, $objetMetier) {
         try {
             $objetRef = self::objetVersEnregistrement($objetMetier);
-            
+
             // Requête textuelle paramétrée (le paramètre est symbolisé par un ?)
-            $sql = "UPDATE Etablissement SET id = ?, nom = ?, adresseRue = ?, codePostal = ?, ville = ?, tel = ?, adresseElectronique = ?, type = ?, civiliteResponsable = ?, nomResponsable = ?, prenomResponsable = ? WHERE id=".$idMetier;
+            $sql = "UPDATE Etablissement SET id = ?, nom = ?, adresseRue = ?, codePostal = ?, ville = ?, tel = ?, adresseElectronique = ?, type = ?, civiliteResponsable = ?, nomResponsable = ?, prenomResponsable = ? WHERE id='". $idMetier ."';";
             // préparer la requête PDO
-            $queryPrepare = Connexion::getPdo()->prepare($sql);
+            $queryPrepare = Connexion::connecter()->prepare($sql);
             // exécuter la requête avec les valeurs des paramètres dans un tableau
             $queryPrepare->execute($objetRef);
             $retour = "UPDATE Réussi !";
         } catch (PDOException $e) {
-            echo get_class() . ' - '.__METHOD__ . ' : '. $e->getMessage();
+            echo get_class() . ' - ' . __METHOD__ . ' : ' . $e->getMessage();
         }
         return $retour;
+    }
+
+    public static function supprimerEtablissement($id) {
+        $req = "DELETE FROM Etablissement WHERE id=?";
+        $stmt = Connexion::connecter()->prepare($req);
+        $ok = $stmt->execute(array($id));
+        return $ok;
     }
 
     public static function delete($idMetier) {
@@ -122,10 +130,81 @@ class EtabDAO implements DAO {
                 $retour = "DELETE Réussi";
             }
         } catch (PDOException $e) {
-            echo get_class() . ' - '.__METHOD__ . ' : '. $e->getMessage();
+            echo get_class() . ' - ' . __METHOD__ . ' : ' . $e->getMessage();
         }
-        
+
         return $retour;
+    }
+
+    public static function estUnNomEtablissement($mode, $id, $nom) {
+//    global $connexion;
+        $nom = str_replace("'", "''", $nom);
+        $connexion = Connexion::connecter();
+        // S'il s'agit d'une création, on vérifie juste la non existence du nom sinon
+        // on vérifie la non existence d'un autre établissement (id!='$id') portant 
+        // le même nom
+        if ($mode == 'C') {
+            $req = "SELECT COUNT(*) FROM Etablissement WHERE nom=?";
+            $stmt = $connexion->prepare($req);
+            $stmt->execute(array($nom));
+        } else {
+            $req = "SELECT COUNT(*) FROM Etablissement WHERE nom=? AND id<>?";
+            $stmt = $connexion->prepare($req);
+            $stmt->execute(array($nom, $id));
+        }
+        return $stmt->fetchColumn();
+    }
+
+    public static function estUnIdEtablissement($id) {
+//    global $connexion;
+        $connexion = Connexion::connecter();
+        $req = "SELECT COUNT(*) FROM Etablissement WHERE id=?";
+        $stmt = $connexion->prepare($req);
+        $stmt->execute(array($id));
+        return $stmt->fetchColumn();
+    }
+
+    public static function creerModifierEtablissement($mode, $id, $nom, $adresseRue, $codePostal, $ville, $tel, $adresseElectronique, $type, $civiliteResponsable, $nomResponsable, $prenomResponsable) {
+        /* INUTILE Avec requêtes préparées
+          $nom = addslashes($nom);
+          $adresseRue = str_replace("'", "''", $adresseRue);
+          $ville = str_replace("'", "''", $ville);
+          $adresseElectronique = str_replace("'", "''", $adresseElectronique);
+          $nomResponsable = str_replace("'", "''", $nomResponsable);
+          $prenomResponsable = str_replace("'", "''", $prenomResponsable);
+         * 
+         */
+        if ($mode == 'C') {
+            $req = "INSERT INTO Etablissement VALUES (:id, :nom, :rue, :cdp, :ville, :tel, :email, :type, :civ, :nomResp, :prenomResp)";
+        } else {
+            $req = "UPDATE Etablissement SET nom=:nom, adresseRue=:rue,
+           codePostal=:cdp, ville=:ville, tel=:tel,
+           adresseElectronique=:email, type=:type,
+           civiliteResponsable=:civ, nomResponsable=:nomResp, prenomResponsable=:prenomResp 
+           WHERE id=:id";
+        }
+        $stmt = Connexion::connecter()->prepare($req);
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':nom', $nom);
+        $stmt->bindParam(':rue', $adresseRue);
+        $stmt->bindParam(':cdp', $codePostal);
+        $stmt->bindParam(':ville', $ville);
+        $stmt->bindParam(':tel', $tel);
+        $stmt->bindParam(':email', $adresseElectronique);
+        $stmt->bindParam(':type', $type);
+        $stmt->bindParam(':civ', $civiliteResponsable);
+        $stmt->bindParam(':nomResp', $nomResponsable);
+        $stmt->bindParam(':prenomResp', $prenomResponsable);
+        $ok = $stmt->execute();
+        return $ok;
+    }
+
+    function obtenirNbEtab() {
+//    global $connexion;
+        $req = "SELECT COUNT(*) FROM Etablissement";
+        $stmt = Connexion::connecter()->prepare($req);
+        $stmt->execute();
+        return $stmt->fetchColumn();
     }
 
 }

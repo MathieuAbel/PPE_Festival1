@@ -1,7 +1,6 @@
 <?php
 
 include("_debut.inc.php");
-use modele\dao\EtabDAO;
 require_once(__DIR__."/../../includes/fonctions.inc.php");
 use modele\Connexion;
 
@@ -17,13 +16,11 @@ echo "
       <td colspan='4'><strong>Etablissements</strong></td>
    </tr>";
 
-Connexion::connecter();
-$arrayEtab = EtabDAO::getAll();
 //$rsEtab = mysql_query($req, $connexion);
 
 // BOUCLE SUR LES ÉTABLISSEMENTS
 for ($i=0; $i<count($arrayEtab); $i++) {
-    $unEtab = $arrayEtab[$i];    
+    $unEtab = $arrayEtab[$i];
     echo "
 		<tr class='ligneTabNonQuad'>
          <td width='52%'>".$unEtab->getNom()."</td>
@@ -38,7 +35,7 @@ for ($i=0; $i<count($arrayEtab); $i++) {
 
     // S'il existe déjà des attributions pour l'établissement, il faudra
     // d'abord les supprimer avant de pouvoir supprimer l'établissement
-    if (!existeAttributionsEtab($connexion, $unEtab->getId())) {
+    if (!\modele\dao\AttribDAO::existeAttributionsEtab($unEtab->getId())) {
         echo "
             <td width='16%' align='center'> 
             <a href='cGestionEtablissements.php?action=demanderSupprimerEtab&id=".$unEtab->getId()."'>

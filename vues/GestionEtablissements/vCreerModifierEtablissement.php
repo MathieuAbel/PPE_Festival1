@@ -1,7 +1,6 @@
 <?php
 
 include("_debut.inc.php");
-use modele\dao\EtabDAO;
 require_once(__DIR__."/../../includes/fonctions.inc.php");
 use modele\Connexion;
 
@@ -30,7 +29,7 @@ if ($action == 'demanderCreerEtab') {
 // faut récupérer les données sinon on affichera les valeurs précédemment 
 // saisies
 if ($action == 'demanderModifierEtab' /*|| $action == 'demanderCreerEtab'*/) {
-    $lgEtab = EtabDAO::getOneById($id);
+    
 
     $id = $lgEtab->getId();
     $lgEtab->getNom();

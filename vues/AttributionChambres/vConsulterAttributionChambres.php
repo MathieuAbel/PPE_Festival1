@@ -5,7 +5,7 @@ include("_debut.inc.php");
 // CONSULTER LES ATTRIBUTIONS DE TOUS LES ÉTABLISSEMENTS
 // IL FAUT QU'IL Y AIT AU MOINS UN ÉTABLISSEMENT OFFRANT DES CHAMBRES POUR QUE 
 // L'AFFICHAGE SOIT EFFECTUÉ
-$nbEtabOffrantChambres = obtenirNbEtabOffrantChambres($connexion);
+$nbEtabOffrantChambres = modele\dao\AttribDAO::obtenirNbEtabOffrantChambres();
 if ($nbEtabOffrantChambres != 0) {
     echo "
    <center> <a href='cAttributionChambres.php?action=demanderModifierAttrib'>
@@ -13,9 +13,9 @@ if ($nbEtabOffrantChambres != 0) {
 
     // POUR CHAQUE ÉTABLISSEMENT : AFFICHAGE D'UN TABLEAU COMPORTANT 2 LIGNES 
     // D'EN-TÊTE (LIGNE NOM ET LIGNE DISPONIBILITÉS) ET LE DÉTAIL DES ATTRIBUTIONS
-    $rsEtab = obtenirIdNomEtablissementsOffrantChambres($connexion);
+    
 
-    $nbTypesChambres = obtenirNbTypesChambres($connexion);
+    
     // Détermination du :
     //    . % de largeur que devra occuper chaque colonne contenant les attributions
     //      (100 - 35 pour la colonne d'en-tête) / nb de types chambres
@@ -44,7 +44,7 @@ if ($nbEtabOffrantChambres != 0) {
       
             <td width='35%'><i>Disponibilités</i></td>";
 
-        $rsTypeChambre = obtenirTypesChambres($connexion);
+        $rsTypeChambre = modele\dao\AttribDAO::obtenirTypesChambres();
 
         // BOUCLE SUR LES TYPES DE CHAMBRES 
         while ($lgTypeChambre = $rsTypeChambre->fetch(PDO::FETCH_ASSOC)) {
@@ -52,7 +52,7 @@ if ($nbEtabOffrantChambres != 0) {
             $libelle = $lgTypeChambre['libelle'];
             // On recherche les disponibilités pour l'établissement et le type
             // de chambre en question
-            $nbChDispo = obtenirNbDispo($connexion, $idEtab, $idTypeChambre);
+            $nbChDispo = modele\dao\AttribDAO::obtenirNbDispo($idEtab, $idTypeChambre);
             echo "<td><center>$libelle<br>$nbChDispo</center></td>";
         }
         echo "
@@ -61,7 +61,7 @@ if ($nbEtabOffrantChambres != 0) {
         // AFFICHAGE DU DÉTAIL DES ATTRIBUTIONS : UNE LIGNE PAR GROUPE AFFECTÉ 
         // DANS L'ÉTABLISSEMENT
 
-        $rsGroupe = obtenirGroupesEtab($connexion, $idEtab);
+        $rsGroupe = modele\dao\AttribDAO::obtenirGroupesEtab($idEtab);
   
         // BOUCLE SUR LES GROUPES (CHAQUE GROUPE EST AFFICHÉ EN LIGNE)
         while ($lgGroupe = $rsGroupe->fetch(PDO::FETCH_ASSOC)) {
@@ -70,14 +70,14 @@ if ($nbEtabOffrantChambres != 0) {
             echo "
             <tr class='ligneTabQuad'>
                <td width='35%'>&nbsp;$nomGroupe</td>";
-            $rsTypeChambre = obtenirIdTypesChambres($connexion);
+            $rsTypeChambre = modele\dao\AttribDAO::obtenirIdTypesChambres();
 
             // BOUCLE SUR LES TYPES DE CHAMBRES (CHAQUE TYPE DE CHAMBRE 
             // FIGURE EN COLONNE)
             while ($lgTypeChambre = $rsTypeChambre->fetch(PDO::FETCH_ASSOC)) {
                 // On recherche si des chambres du type en question ont 
                 // déjà été attribuées à ce groupe dans l'établissement
-                $nbOccupGroupe = obtenirNbOccupGroupe($connexion, $idEtab, $lgTypeChambre["id"], $idGroupe);
+                $nbOccupGroupe = modele\dao\AttribDAO::obtenirNbOccupGroupe($idEtab, $lgTypeChambre["id"], $idGroupe);
                 echo "
                   <td width='$pourcCol%'><center>$nbOccupGroupe</center></td>";
             } // Fin de la boucle sur les types de chambres

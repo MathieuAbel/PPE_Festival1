@@ -10,7 +10,7 @@ echo "
    <input type='hidden' value='$idEtab' name='idEtab'>
    <input type='hidden' value='$idTypeChambre' name='idTypeChambre'>
    <input type='hidden' value='$idGroupe' name='idGroupe'>";
-$nomGroupe = obtenirNomGroupe($connexion, $idGroupe);
+$nomGroupe = \modele\dao\AttribDAO::obtenirNomGroupe($idGroupe);
 echo "
    <br><center>Combien de chambres de type $idTypeChambre souhaitez-vous pour le 
    groupe $nomGroupe ?";

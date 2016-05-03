@@ -14,7 +14,8 @@ if ($action == 'demanderCreerTypeChambre') {
 // S'il s'agit d'une modification et qu'on ne "vient" pas de ce formulaire, il
 // faut récupérer le libellé
 if ($action == 'demanderModifierTypeChambre') {
-    $libelle = obtenirLibelleTypeChambre($connexion, $id);
+    $id = $lgTypeChambre->getId();
+    $libelle = $lgTypeChambre->getLibelle();
 }
 
 // Initialisations en fonction du mode (création ou modification) 

@@ -1,6 +1,5 @@
 <?php
 include("_debut.inc.php");
-use modele\dao\FonctionsCommunesDAO;
 // OBTENIR LE DÉTAIL DU GROUPE SÉLECTIONNÉ
 
 $lgEtab = obtenirDetailGroupe($connexion, $id);

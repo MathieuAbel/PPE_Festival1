@@ -6,9 +6,9 @@ include("_debut.inc.php");
 
 $id = $_REQUEST['id'];  // Non obligatoire mais plus propre
 echo "
-<br><center>Voulez-vous vraiment supprimer le type de chambre $id ?
+<br><center>Voulez-vous vraiment supprimer le type de chambre " . $lgTypeChambre->getId() . " ?
 <h3><br>
-<a href='cGestionTypesChambres.php?action=validerSupprimerTypeChambre&id=$id'>
+<a href='cGestionTypesChambres.php?action=validerSupprimerTypeChambre&id=" . $lgTypeChambre->getId() . "'>
 Oui</a>&nbsp; &nbsp; &nbsp; &nbsp;
 <a href='cGestionTypesChambres.php'>Non</a></h3></center>";
 

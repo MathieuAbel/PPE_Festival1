@@ -2,13 +2,16 @@
 
 include("_debut.inc.php");
 
+use modele\dao\TypeChambreDAO;
+use modele\dao\OffreDAO;
+
 // MODIFIER LES OFFRES DE L'ÉTABLISSEMENT SÉLECTIONNÉ
 
 echo "
 <form method='POST' action='cOffreHebergement.php'>
    <input type='hidden' value='validerModifierOffre' name='action'>";
 
-$lgEtab = obtenirDetailEtablissement($connexion, $idEtab);
+
 
 // $i va permettre de manipuler le tableau $nbChambres qui contient 
 // les offres de chambres relatives à tous les types de chambres pour 
@@ -16,7 +19,6 @@ $lgEtab = obtenirDetailEtablissement($connexion, $idEtab);
 // $nbChambres[0] contiendra le nombre de chambres pour le 1er type de 
 // chambre, $nbChambres[1] contiendra le nombre de chambres pour le 2ème type  
 // de chambre...
-$i = 0;
 
 $nom = $lgEtab['nom'];
 
@@ -33,15 +35,16 @@ echo "
          <td width='33%'>Nombre de chambres</td> 
       </tr>";
 
-$rsTypeChambre = obtenirTypesChambres($connexion);
 
 // BOUCLE SUR LES TYPES DE CHAMBRES (AFFICHAGE D'UNE LIGNE PAR TYPE DE 
 // CHAMBRE AVEC EN 3ÈME COLONNE LE NOMBRE DE CHAMBRES OFFERTES DANS
 // L'ÉTABLISSEMENT POUR LE TYPE DE CHAMBRE OU LA VALEUR EN ERREUR LE CAS
 // ÉCHÉANT)
-while ($lgTypeChambre = $rsTypeChambre->fetch(PDO::FETCH_ASSOC)) {
-    $idTypeChambre = $lgTypeChambre['id'];
-    $libelle = $lgTypeChambre['libelle'];
+
+for ($i = 0; $i < count($arrayTypeChambre); $i++) {
+    $unTypeChambre = $arrayTypeChambre[$i];
+    $idTypeChambre = $unTypeChambre->getId();
+    $libelle = $unTypeChambre->getLibelle();
 
     echo "
          <tr class='ligneTabQuad'>
@@ -52,14 +55,14 @@ while ($lgTypeChambre = $rsTypeChambre->fetch(PDO::FETCH_ASSOC)) {
     // Si on "vient" de ce formulaire (action 'validerModifierOffre') et
     // que le nombre de chambres pour le type en question est en erreur,
     // ce nombre est affiché en erreur
-    if ($action == 'validerModifierOffre' && (!estEntier($nbChambres[$i]) || !estModifOffreCorrecte($connexion, $idEtab, $idTypeChambre, $nbChambres[$i]))) {
+    if ($action == 'validerModifierOffre' && (!estEnstier($nbChambres[$i]) || !estModifOffreCorrecte($connexion, $idEtab, $idTypeChambre, $nbChambres[$i]))) {
         echo "
                <td align='center'><input type='text' value='$nbChambres[$i]' 
                name='nbChambres[$i]' maxlength='3' class='erreur'></td>";
     } else {
         // Appel à la fonction obtenirNbOffre pour récupérer le nombre
         // de chambres offertes
-        $nbOffre = obtenirNbOffre($connexion, $idEtab, $idTypeChambre);
+        $nbOffre = OffreDAO::obtenirNbOffre($idEtab, $idTypeChambre);
         echo "
                <td align='center'><input type='text' value='$nbOffre' 
                name='nbChambres[$i]' maxlength='3'></td>";
@@ -70,7 +73,6 @@ while ($lgTypeChambre = $rsTypeChambre->fetch(PDO::FETCH_ASSOC)) {
             <input type='hidden' value='$idTypeChambre' 
             name='idTypeChambre[$i]'>
          </tr>";
-    $i = $i + 1;
 } // Fin de la boucle sur les types de chambres
 echo
 "</table>";

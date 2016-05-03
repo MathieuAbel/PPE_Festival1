@@ -1,9 +1,11 @@
 <?php
 
-include("_gestionErreurs.inc.php");
-include("gestionDonnees/_connexion.inc.php");
-include("gestionDonnees/_gestionBaseFonctionsCommunes.inc.php");
-include("gestionDonnees/_gestionBaseFonctionsGestionAttributions.inc.php");
+use modele\Connexion;
+use modele\dao\AttribDAO;
+use modele\metier\Attribution;
+
+require_once "_gestionErreurs.inc.php";
+require_once "./includes/fonctions.inc.php";
 
 // 1ère étape (donc pas d'action choisie) : affichage du tableau des 
 // attributions en lecture seule
@@ -13,14 +15,19 @@ if (!isset($_REQUEST['action'])) {
 
 $action = $_REQUEST['action'];
 
+Connexion::connecter();
+
 // Aiguillage selon l'étape
 switch ($action) {
     case 'initial':
+        $rsEtab = modele\dao\AttribDAO::obtenirIdNomEtablissementsOffrantChambres();
+        $nbTypesChambres = modele\dao\AttribDAO::obtenirNbTypesChambres();
+        $arrayAttribution = AttribDAO::getAll();
         include("vues/AttributionChambres/vConsulterAttributionChambres.php");
         break;
 
     case 'demanderModifierAttrib':
-        include("vues/AttributionChambres/vModifierAttributionChambres.php");
+        redondance();
         break;
 
     case 'donnerNbChambres':
@@ -28,6 +35,8 @@ switch ($action) {
         $idTypeChambre = $_REQUEST['idTypeChambre'];
         $idGroupe = $_REQUEST['idGroupe'];
         $nbChambres = $_REQUEST['nbChambres'];
+        AttribDAO::getOneByIdCompo($idEtab, $idTypeChambre, $idGroupe);
+//        $idGroupe = AttribDAO::obtenirNomGroupe($idGroupe);
         include("vues/AttributionChambres/vDonnerNbChambresAttributionChambres.php");
         break;
 
@@ -36,12 +45,21 @@ switch ($action) {
         $idTypeChambre = $_REQUEST['idTypeChambre'];
         $idGroupe = $_REQUEST['idGroupe'];
         $nbChambres = $_REQUEST['nbChambres'];
-        modifierAttribChamb($connexion, $idEtab, $idTypeChambre, $idGroupe, $nbChambres);
-        include("vues/AttributionChambres/vModifierAttributionChambres.php");
+        AttribDAO::modifierAttribChamb($idEtab, $idTypeChambre, $idGroupe, $nbChambres);
+        $idTypeChambre = modele\dao\AttribDAO::obtenirTypesChambres();
+        $nomGroupe = modele\dao\AttribDAO::obtenirGroupesEtab($idEtab);
+        redondance();
         break;
 }
-
 // Fermeture de la connexion au serveur MySql
 $connexion = null;
 
-
+function redondance() {
+    $rsEtab = \modele\dao\AttribDAO::obtenirNomEtablissementsOffrantChambres();
+    $rsIdEtab = \modele\dao\AttribDAO::obtenirIdEtablissementsOffrantChambres();
+    $rsTypeChambre = \modele\dao\AttribDAO::obtenirIdTypesChambres();
+    $nbTypesChambres = \modele\dao\AttribDAO::obtenirNbTypesChambres();
+    $rsGroupe = \modele\dao\AttribDAO::obtenirIdNomGroupesAHeberger();
+    $nbEtabOffrantChambres = \modele\dao\AttribDAO::obtenirNbEtabOffrantChambres();
+    include("vues/AttributionChambres/vModifierAttributionChambres.php");
+}

@@ -1,10 +1,11 @@
 <?php
 
+use modele\Connexion;
 use modele\dao\EtabDAO;
-include("_gestionErreurs.inc.php");
-include("includes/fonctions.inc.php");
-include("gestionDonnees/_connexion.inc.php");
-include("gestionDonnees/_gestionBaseFonctionsCommunes.inc.php");
+use modele\metier\Etablissement;
+
+require_once "_gestionErreurs.inc.php";
+require_once "./includes/fonctions.inc.php";
 
 // 1ère étape (donc pas d'action choisie) : affichage du tableau des 
 // établissements 
@@ -14,35 +15,45 @@ if (!isset($_REQUEST['action'])) {
 
 $action = $_REQUEST['action'];
 
+Connexion::connecter();
+
 // Aiguillage selon l'étape
 switch ($action) {
     case 'initial' :
-        include("vues/GestionEtablissements/vObtenirEtablissements.php");
+        $arrayEtab = EtabDAO::getAll();
+        include("./vues/GestionEtablissements/vObtenirEtablissements.php");
         break;
 
     case 'detailEtab':
+
         $id = $_REQUEST['id'];
-        include("vues/GestionEtablissements/vObtenirDetailEtablissement.php");
+        $lgEtab = EtabDAO::getOneById($id);
+        $arrayEtab = EtabDAO::getAll();
+        include("./vues/GestionEtablissements/vObtenirDetailEtablissement.php");
         break;
 
     case 'demanderSupprimerEtab':
+
         $id = $_REQUEST['id'];
-        include("vues/GestionEtablissements/vSupprimerEtablissement.php");
+        include("./vues/GestionEtablissements/vSupprimerEtablissement.php");
         break;
 
     case 'demanderCreerEtab':
-        include("vues/GestionEtablissements/vCreerModifierEtablissement.php");
+
+        include("./vues/GestionEtablissements/vCreerModifierEtablissement.php");
         break;
 
     case 'demanderModifierEtab':
         $id = $_REQUEST['id'];
-        include("vues/GestionEtablissements/vCreerModifierEtablissement.php");
+        $lgEtab = EtabDAO::getOneById($id);
+        include("./vues/GestionEtablissements/vCreerModifierEtablissement.php");
         break;
 
     case 'validerSupprimerEtab':
         $id = $_REQUEST['id'];
-        supprimerEtablissement($connexion, $id);
-        include("vues/GestionEtablissements/vObtenirEtablissements.php");
+        EtabDAO::delete($id);
+        $arrayEtab = EtabDAO::getAll();
+        include("./vues/GestionEtablissements/vObtenirEtablissements.php");
         break;
 
     case 'validerCreerEtab':case 'validerModifierEtab':
@@ -59,20 +70,24 @@ switch ($action) {
         $prenomResponsable = $_REQUEST['prenomResponsable'];
 
         if ($action == 'validerCreerEtab') {
-            verifierDonneesEtabC($connexion, $id, $nom, $adresseRue, $codePostal, $ville, $tel, $nomResponsable);
+            verifierDonneesEtabC($id, $nom, $adresseRue, $codePostal, $ville, $tel, $nomResponsable);
             if (nbErreurs() == 0) {
-                creerModifierEtablissement($connexion, 'C', $id, $nom, $adresseRue, $codePostal, $ville, $tel, $adresseElectronique, $type, $civiliteResponsable, $nomResponsable, $prenomResponsable);
-                include("vues/GestionEtablissements/vObtenirEtablissements.php");
+                $objetEtablissement = new Etablissement($id, $nom, $adresseRue, $codePostal, $ville, $tel, $adresseElectronique, $type, $civiliteResponsable, $nomResponsable, $prenomResponsable);
+                EtabDAO::insert($objetEtablissement);
+                $arrayEtab = EtabDAO::getAll();
+                include("./vues/GestionEtablissements/vObtenirEtablissements.php");
             } else {
-                include("vues/GestionEtablissements/vCreerModifierEtablissement.php");
+                include("./vues/GestionEtablissements/vCreerModifierEtablissement.php");
             }
         } else {
-            verifierDonneesEtabM($connexion, $id, $nom, $adresseRue, $codePostal, $ville, $tel, $nomResponsable);
+            verifierDonneesEtabM($id, $nom, $adresseRue, $codePostal, $ville, $tel, $nomResponsable);
             if (nbErreurs() == 0) {
-                creerModifierEtablissement($connexion, 'M', $id, $nom, $adresseRue, $codePostal, $ville, $tel, $adresseElectronique, $type, $civiliteResponsable, $nomResponsable, $prenomResponsable);
-                include("vues/GestionEtablissements/vObtenirEtablissements.php");
+                $objetMetier = new Etablissement($id, $nom, $adresseRue, $codePostal, $ville, $tel, $adresseElectronique, $type, $civiliteResponsable, $nomResponsable, $prenomResponsable);
+                EtabDAO::update($id, $objetMetier);
+                $arrayEtab = EtabDAO::getAll();
+                include("./vues/GestionEtablissements/vObtenirEtablissements.php");
             } else {
-                include("vues/GestionEtablissements/vCreerModifierEtablissement.php");
+                include("./vues/GestionEtablissements/vCreerModifierEtablissement.php");
             }
         }
         break;
@@ -81,7 +96,7 @@ switch ($action) {
 // Fermeture de la connexion au serveur MySql
 $connexion = null;
 
-function verifierDonneesEtabC($connexion, $id, $nom, $adresseRue, $codePostal, $ville, $tel, $nomResponsable) {
+function verifierDonneesEtabC($id, $nom, $adresseRue, $codePostal, $ville, $tel, $nomResponsable) {
     if ($id == "" || $nom == "" || $adresseRue == "" || $codePostal == "" ||
             $ville == "" || $tel == "" || $nomResponsable == "") {
         ajouterErreur('Chaque champ suivi du caractère * est obligatoire');
@@ -93,12 +108,12 @@ function verifierDonneesEtabC($connexion, $id, $nom, $adresseRue, $codePostal, $
             ajouterErreur
                     ("L'identifiant doit comporter uniquement des lettres non accentuées et des chiffres");
         } else {
-            if (estUnIdEtablissement($connexion, $id)) {
+            if (EtabDAO::estUnIdEtablissement($id)) {
                 ajouterErreur("L'établissement $id existe déjà");
             }
         }
     }
-    if ($nom != "" && estUnNomEtablissement($connexion, 'C', $id, $nom)) {
+    if ($nom != "" && EtabDAO::estUnNomEtablissement('C', $id, $nom)) {
         ajouterErreur("L'établissement $nom existe déjà");
     }
     if ($codePostal != "" && !estUnCp($codePostal)) {
@@ -106,12 +121,12 @@ function verifierDonneesEtabC($connexion, $id, $nom, $adresseRue, $codePostal, $
     }
 }
 
-function verifierDonneesEtabM($connexion, $id, $nom, $adresseRue, $codePostal, $ville, $tel, $nomResponsable) {
+function verifierDonneesEtabM($id, $nom, $adresseRue, $codePostal, $ville, $tel, $nomResponsable) {
     if ($nom == "" || $adresseRue == "" || $codePostal == "" || $ville == "" ||
             $tel == "" || $nomResponsable == "") {
         ajouterErreur('Chaque champ suivi du caractère * est obligatoire');
     }
-    if ($nom != "" && estUnNomEtablissement($connexion, 'M', $id, $nom)) {
+    if ($nom != "" && EtabDAO::estUnNomEtablissement('M', $id, $nom)) {
         ajouterErreur("L'établissement $nom existe déjà");
     }
     if ($codePostal != "" && !estUnCp($codePostal)) {

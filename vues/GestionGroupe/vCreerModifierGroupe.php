@@ -1,12 +1,14 @@
 <?php
 
 include("_debut.inc.php");
+require_once(__DIR__."/../../includes/fonctions.inc.php");
 
 // CRÉER OU MODIFIER UN GROUPE 
 // S'il s'agit d'une création et qu'on ne "vient" pas de ce formulaire (on 
 // "vient" de ce formulaire uniquement s'il y avait une erreur), il faut définir 
 // les champs à vide sinon on affichera les valeurs précédemment saisies
 if ($action == 'demanderCreerGroupes') {
+    
     $id = '';
     $nom = '';
     $identiteResponsable = '';
@@ -14,21 +16,19 @@ if ($action == 'demanderCreerGroupes') {
     $nombrePersonnes = '';
     $nomPays = '';
     $hebergement = 'O';
-    
 }
 
 // S'il s'agit d'une modification et qu'on ne "vient" pas de ce formulaire, il
 // faut récupérer les données sinon on affichera les valeurs précédemment 
 // saisies
 if ($action == 'demanderModifierGroupe') {
-    $lgGroupe = obtenirDetailGroupe($connexion, $id);
-
-    $nom = $lgGroupe['nom'];
-    $identiteResponsable = $lgGroupe['identiteResponsable'];
-    $adressePostale = $lgGroupe['adressePostale'];
-    $nombrePersonnes= $lgGroupe['nombrePersonnes'];
-    $nomPays = $lgGroupe['nomPays'];
-    $hebergement = $lgGroupe['hebergement'];
+    
+    $nom = $lgGroupe->getNom();
+    $identiteResponsable = $lgGroupe->getIdentiteResponsable();
+    $adressePostale = $lgGroupe->getAdressePostale();
+    $nombrePersonnes= $lgGroupe->getNombrePersonnes();
+    $nomPays = $lgGroupe->getNomPays();
+    $hebergement = $lgGroupe->getHebergement();
   
 }
 

@@ -1,5 +1,7 @@
 <?php
 
+use modele\dao\AttribDAO;
+
 include("_debut.inc.php");
 
 // AFFICHER L'ENSEMBLE DES TYPES DE CHAMBRES 
@@ -13,13 +15,13 @@ echo "
       <td colspan='4'><strong>Types de chambres</strong></td>
    </tr>";
 
-$rsTypeChambre = obtenirTypesChambres($connexion);
 
 
 // BOUCLE SUR LES TYPES DE CHAMBRES
-while ($lgTypeChambre = $rsTypeChambre->fetch(PDO::FETCH_ASSOC)) {
-    $id = $lgTypeChambre['id'];
-    $libelle = $lgTypeChambre['libelle'];
+for ($i=0; $i<count($arrayTypeChambre); $i++) {
+    $unTypeChambre = $arrayTypeChambre[$i];
+    $id = $unTypeChambre->getId();
+    $libelle = $unTypeChambre->getLibelle();
     echo "
       <tr class='ligneTabNonQuad'> 
          <td width='15%'>$id</td>
@@ -31,7 +33,7 @@ while ($lgTypeChambre = $rsTypeChambre->fetch(PDO::FETCH_ASSOC)) {
 
     // S'il existe déjà des attributions pour le type de chambre, il faudra
     // d'abord les supprimer avant de pouvoir supprimer le type de chambre
-    if (!existeAttributionsTypeChambre($connexion, $id)) {
+    if (!AttribDAO::existeAttributionsTypeChambre($id)) {
         echo "
             <td width='26%' align='center'>
             <a href='cGestionTypesChambres.php?action=demanderSupprimerTypeChambre&id=$id'>

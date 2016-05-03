@@ -1,16 +1,14 @@
 <?php
 
 include("_debut.inc.php");
+require_once(__DIR__."/../../includes/fonctions.inc.php");
 
 // SUPPRIMER LE GROUPE SÉLECTIONNÉ
 
-$id = $_REQUEST['id'];  // Non obligatoire mais plus propre
-$lgGroupe = obtenirDetailGroupe($connexion, $id);
-$nom = $lgGroupe['nom'];
 echo "
-<br><center>Voulez-vous vraiment supprimer le groupe $nom ?
+<br><center>Voulez-vous vraiment supprimer le groupe ".$lgGroupe->getNom()." ?
 <h3><br>
-<a href='cGestionGroupes.php?action=validerSupprimerGroupe&id=$id'>Oui</a>
+<a href='cGestionGroupes.php?action=validerSupprimerGroupe&id=".$lgGroupe->getId()."'>Oui</a>
 &nbsp; &nbsp; &nbsp; &nbsp;
 <a href='cGestionGroupes.php?'>Non</a></h3>
 </center>";

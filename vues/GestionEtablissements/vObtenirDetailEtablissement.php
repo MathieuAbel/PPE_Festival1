@@ -1,13 +1,9 @@
 <?php
 
 include("_debut.inc.php");
-use modele\dao\EtabDAO;
 require_once(__DIR__."/../../includes/fonctions.inc.php");
-use modele\Connexion;
 
 // OBTENIR LE DÉTAIL DE L'ÉTABLISSEMENT SÉLECTIONNÉ
-Connexion::connecter();
-$lgEtab = EtabDAO::getOneById($id);
 
 echo "
 <br>
