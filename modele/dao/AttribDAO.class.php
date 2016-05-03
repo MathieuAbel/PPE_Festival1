@@ -4,12 +4,13 @@ namespace modele\dao;
 
 use modele\Connexion;
 use modele\metier\Attribution;
+use modele\dao\DAO;
 use \PDO;
 
-class AttribDAO implements Dao {
+class AttribDAO implements DAO {
 
     public static function enregistrementVersObjet($enreg) {
-        $retour = new Attribution($enreg['idEtab'], $enreg['idTypeChambre'], $enreg['idGroupe'], $enreg['nombreChambres']);
+        $retour = new Attribution($enreg['idEtab'], $enreg['idtypechambre'], $enreg['idgroupe'], $enreg['nombreChambres']);
         return $retour;
     }
 
@@ -26,7 +27,7 @@ class AttribDAO implements Dao {
     public static function getAll() {
         $retour = null;
         // Requête textuelle
-        $sql = "SELECT * FROM Attribution";
+        $sql = "SELECT * FROM attribution";
         try {
             // préparer la requête PDO
             $queryPrepare = Connexion::getPdo()->prepare($sql);
@@ -53,7 +54,7 @@ class AttribDAO implements Dao {
         $retour = null;
         try {
             // Requête textuelle paramétrée (le paramètre est symbolisé par un ?)
-            $sql = "SELECT * FROM Attribution WHERE idEtab = ?";
+            $sql = "SELECT * FROM attribution WHERE idEtab = ?";
             // préparer la requête PDO
             $queryPrepare = Connexion::connecter()->prepare($sql);
             // exécuter la requête avec les valeurs des paramètres (il n'y en a qu'un ici) dans un tableau
@@ -75,7 +76,7 @@ class AttribDAO implements Dao {
         $valeursClePrimaire = array($idEtablissement, $idTypeChambre, $idGroupe);
         try {
             // Requête textuelle paramétrée (le paramètre est symbolisé par un ?)
-            $sql = "SELECT * FROM Attribution WHERE idEtab = ? AND idTypeChambre = ? AND idGroupe = ?";
+            $sql = "SELECT * FROM attribution WHERE idEtab = ? AND idtypechambre = ? AND idgroupe = ?";
             // préparer la requête PDO
             $queryPrepare = Connexion::getPdo()->prepare($sql);
             // exécuter la requête avec les valeurs des paramètres (il n'y en a qu'un ici) dans un tableau
@@ -96,7 +97,7 @@ class AttribDAO implements Dao {
         try {
             $objetRef = self::objetVersEnregistrement($objetMetier);
             // Requête textuelle paramétrée (le paramètre est symbolisé par un ?)
-            $sql = "INSERT INTO Attribution (idEtab, idTypeChambre, idGroupe, nombreChambres ) VALUES (?, ?, ?, ?)";
+            $sql = "INSERT INTO attribution (idEtab, idtypechambre, idgroupe, nombreChambres ) VALUES (?, ?, ?, ?)";
             // préparer la requête PDO
             $queryPrepare = Connexion::connecter()->prepare($sql);
             // exécuter la requête avec les valeurs des paramètres dans un tableau
@@ -113,7 +114,7 @@ class AttribDAO implements Dao {
             $objetRef = self::objetVersEnregistrement($objetMetier);
 
             // Requête textuelle paramétrée (le paramètre est symbolisé par un ?)
-            $sql = "UPDATE Attribution SET idEtab=?, idTypeChambre=?, idGroupe=?, nombreChambres=?  WHERE idEtab=" . $idMetier;
+            $sql = "UPDATE attribution SET idEtab=?, idtypechambre=?, idgroupe=?, nombreChambres=?  WHERE idEtab=" . $idMetier;
             // préparer la requête PDO
             $queryPrepare = Connexion::connecter()->prepare($sql);
             // exécuter la requête avec les valeurs des paramètres dans un tableau
@@ -128,7 +129,7 @@ class AttribDAO implements Dao {
     public static function delete($idMetier) {
         try {
             // Requête textuelle paramétrée (le paramètre est symbolisé par un ?)
-            $sql = "DELETE FROM Attribution WHERE idEtab=?;";
+            $sql = "DELETE FROM attribution WHERE idEtab=?;";
 
             // préparer la requête PDO
             $queryPrepare = Connexion::connecter()->prepare($sql);
@@ -145,16 +146,16 @@ class AttribDAO implements Dao {
         return $retour;
     }
 
-    public static function existeAttributionsEtab($id) {
-        $req = "SELECT COUNT(*) FROM Attribution WHERE idEtab=?";
+    public static function existeattributionsEtab($id) {
+        $req = "SELECT COUNT(*) FROM attribution WHERE idEtab=?";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute(array($id));
         return $stmt->fetchColumn();
     }
 
-    public static function existeAttributionsTypeChambre($id) {
+    public static function existeattributionsTypeChambre($id) {
         $connexion = Connexion::connecter();
-        $req = "SELECT COUNT(*) FROM Attribution WHERE idTypeChambre=?";
+        $req = "SELECT COUNT(*) FROM attribution WHERE idtypechambre=?";
         $stmt = $connexion->prepare($req);
         $stmt->execute(array($id));
         return $stmt->fetchColumn();
@@ -162,15 +163,15 @@ class AttribDAO implements Dao {
 
     public static function obtenirNbEtabOffrantChambres() {
 //    global $connexion;
-        $req = "SELECT COUNT(DISTINCT idEtab) FROM Offre";
+        $req = "SELECT COUNT(DISTINCT idEtab) FROM offre";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
 
     public static function obtenirIdNomEtablissementsOffrantChambres() {
-        $req = "SELECT DISTINCT id, nom FROM Etablissement e 
-                INNER JOIN Offre o ON e.id = o.idEtab 
+        $req = "SELECT DISTINCT id, nom FROM etablissement e 
+                INNER JOIN offre o ON e.id = o.idEtab 
                 ORDER BY id";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute();
@@ -178,7 +179,7 @@ class AttribDAO implements Dao {
     }
 
     public static function obtenirIdTypesChambres() {
-        $req = "SELECT id FROM TypeChambre";
+        $req = "SELECT id FROM typechambre";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute();
         return $stmt;
@@ -186,15 +187,15 @@ class AttribDAO implements Dao {
 
     public static function obtenirNbOccupGroupe($idEtab, $idTypeChambre, $idGroupe) {
 //    global $connexion;
-        $req = "SELECT nombreChambres FROM Attribution 
+        $req = "SELECT nombreChambres FROM attribution 
             WHERE idEtab=:idEtab 
-              AND idTypeChambre=:idTypeCh 
-              AND idGroupe=:idGroupe";
+              AND idtypechambre=:idTypeCh 
+              AND idgroupe=:idgroupe";
 
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->bindParam(':idEtab', $idEtab);
         $stmt->bindParam(':idTypeCh', $idTypeChambre);
-        $stmt->bindParam(':idGroupe', $idGroupe);
+        $stmt->bindParam(':idgroupe', $idGroupe);
         $stmt->execute();
         $ok = $stmt->fetchColumn();
         if ($ok) {
@@ -205,15 +206,15 @@ class AttribDAO implements Dao {
     }
 
     public static function obtenirNbTypesChambres() {
-        $req = "SELECT count(*) FROM TypeChambre";
+        $req = "SELECT count(*) FROM typechambre";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
 
     public static function obtenirNbOffre($idEtab, $idTypeChambre) {
-        $req = "SELECT nombreChambres FROM Offre WHERE idEtab=:idEtab AND 
-        idTypeChambre=:idTypeCh";
+        $req = "SELECT nombreChambres FROM offre WHERE idEtab=:idEtab AND 
+        idtypechambre=:idTypeCh";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->bindParam(':idEtab', $idEtab);
         $stmt->bindParam(':idTypeCh', $idTypeChambre);
@@ -228,7 +229,7 @@ class AttribDAO implements Dao {
 
     public static function obtenirNbOccup($idEtab, $idTypeChambre) {
         $req = "SELECT IFNULL(SUM(nombreChambres), 0) AS totalChambresOccup FROM
-        Attribution WHERE idEtab=:idEtab AND idTypeChambre=:idTypeCh";
+        attribution WHERE idEtab=:idEtab AND idtypechambre=:idTypeCh";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->bindParam(':idEtab', $idEtab);
         $stmt->bindParam(':idTypeCh', $idTypeChambre);
@@ -252,15 +253,15 @@ class AttribDAO implements Dao {
     }
 
     public static function obtenirTypesChambres() {
-        $req = "SELECT * FROM TypeChambre";
+        $req = "SELECT * FROM typechambre";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute();
         return $stmt;
     }
 
     public static function obtenirNomEtablissementsOffrantChambres() {
-        $req = "SELECT DISTINCT nom FROM Etablissement e 
-                INNER JOIN Offre o ON e.id = o.idEtab 
+        $req = "SELECT DISTINCT nom FROM etablissement e 
+                INNER JOIN offre o ON e.id = o.idEtab 
                 ORDER BY id";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute();
@@ -268,8 +269,8 @@ class AttribDAO implements Dao {
     }
 
     public static function obtenirIdEtablissementsOffrantChambres() {
-        $req = "SELECT DISTINCT id FROM Etablissement e 
-                INNER JOIN Offre o ON e.id = o.idEtab 
+        $req = "SELECT DISTINCT id FROM etablissement e 
+                INNER JOIN offre o ON e.id = o.idEtab 
                 ORDER BY id";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute();
@@ -277,14 +278,14 @@ class AttribDAO implements Dao {
     }
 
     public static function obtenirIdNomGroupesAHeberger() {
-        $req = "SELECT id, nom FROM Groupe WHERE hebergement='O' ORDER BY id";
+        $req = "SELECT id, nom FROM groupe WHERE hebergement='O' ORDER BY id";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute();
         return $stmt;
     }
 
     public static function obtenirNomGroupe($id) {
-        $req = "SELECT nom FROM Groupe WHERE id=?";
+        $req = "SELECT nom FROM groupe WHERE id=?";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute(array($id));
         return $stmt->fetchColumn();
@@ -294,32 +295,32 @@ class AttribDAO implements Dao {
 
     public static function modifierAttribChamb($idEtab, $idTypeChambre, $idGroupe, $nbChambres) {
         $req = "SELECT COUNT(*) AS nombreAttribGroupe 
-        FROM Attribution 
-        WHERE idEtab= :idEtab AND idTypeChambre=:idTypeCh AND idGroupe=:idGroupe";
+        FROM attribution 
+        WHERE idEtab= :idEtab AND idtypechambre=:idTypeCh AND idgroupe=:idgroupe";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->bindParam(':idEtab', $idEtab);
         $stmt->bindParam(':idTypeCh', $idTypeChambre);
-        $stmt->bindParam(':idGroupe', $idGroupe);
+        $stmt->bindParam(':idgroupe', $idGroupe);
         $stmt->execute();
         $lgAttrib = $stmt->fetchColumn();
         if ($nbChambres == 0) {
-            $req = "DELETE FROM Attribution WHERE idEtab=:idEtab AND 
-           idTypeChambre=:idTypeCh AND idGroupe=:idGroupe";
+            $req = "DELETE FROM attribution WHERE idEtab=:idEtab AND 
+           idtypechambre=:idTypeCh AND idgroupe=:idgroupe";
             $stmt = Connexion::connecter()->prepare($req);
         } else {
             if ($lgAttrib != 0) {
-                $req = "UPDATE Attribution SET nombreChambres=:nbCh 
-                WHERE idEtab=:idEtab AND idTypeChambre=:idTypeCh 
-                AND idGroupe=:idGroupe";
+                $req = "UPDATE attribution SET nombreChambres=:nbCh 
+                WHERE idEtab=:idEtab AND idtypechambre=:idTypeCh 
+                AND idgroupe=:idgroupe";
             } else {
-                $req = "INSERT INTO Attribution VALUES(:idEtab, :idTypeCh, :idGroupe, :nbCh)";
+                $req = "INSERT INTO attribution VALUES(:idEtab, :idTypeCh, :idgroupe, :nbCh)";
             }
             $stmt = Connexion::connecter()->prepare($req);
             $stmt->bindParam(':nbCh', $nbChambres);
         }
         $stmt->bindParam(':idEtab', $idEtab);
         $stmt->bindParam(':idTypeCh', $idTypeChambre);
-        $stmt->bindParam(':idGroupe', $idGroupe);
+        $stmt->bindParam(':idgroupe', $idGroupe);
 
         $ok = $stmt->execute();
         return $ok;
@@ -328,8 +329,8 @@ class AttribDAO implements Dao {
 // Retourne la requête permettant d'obtenir les id et noms des groupes 
 // affectés dans l'établissement transmis
     public static function obtenirGroupesEtab($id) {
-        $req = "SELECT DISTINCT id, nom FROM Groupe 
-        INNER JOIN Attribution ON Attribution.idGroupe = Groupe.id 
+        $req = "SELECT DISTINCT id, nom FROM groupe 
+        INNER JOIN attribution ON attribution.idgroupe = groupe.id 
         WHERE idEtab=?";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute(array($id));
