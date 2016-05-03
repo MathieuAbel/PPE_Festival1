@@ -14,9 +14,9 @@ $nom = $lgEtab->getNom();
 echo "
 <br><center>Voulez-vous vraiment supprimer l'établissement ".$lgEtab->getNom()." ?
 <h3><br>
-<a href='./controleur/cGestionEtablissements.php?action=validerSupprimerEtab&id=".$lgEtab->getId()."'>Oui</a>
+<a href='cGestionEtablissements.php?action=validerSupprimerEtab&id=".$lgEtab->getId()."'>Oui</a>
 &nbsp; &nbsp; &nbsp; &nbsp;
-<a href='./controleur/cGestionEtablissements.php?'>Non</a></h3>
+<a href='cGestionEtablissements.php?'>Non</a></h3>
 </center>";
 
 include("_fin.inc.php");

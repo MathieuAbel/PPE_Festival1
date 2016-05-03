@@ -34,7 +34,7 @@ class EtabDAO implements DAO {
     public static function getAll() {
         $retour = null;
         // Requête textuelle
-        $sql = "SELECT * FROM Etablissement";
+        $sql = "SELECT * FROM etablissement";
         try {
             // préparer la requête PDO
             $queryPrepare = Connexion::connecter()->prepare($sql);
@@ -61,7 +61,7 @@ class EtabDAO implements DAO {
         $retour = null;
         try {
             // Requête textuelle paramétrée (le paramètre est symbolisé par un ?)
-            $sql = "SELECT * FROM Etablissement WHERE id = ?";
+            $sql = "SELECT * FROM etablissement WHERE id = ?";
             // préparer la requête PDO
             $queryPrepare = Connexion::connecter()->prepare($sql);
             // exécuter la requête avec les valeurs des paramètres (il n'y en a qu'un ici) dans un tableau
@@ -99,7 +99,7 @@ class EtabDAO implements DAO {
             $objetRef = self::objetVersEnregistrement($objetMetier);
 
             // Requête textuelle paramétrée (le paramètre est symbolisé par un ?)
-            $sql = "UPDATE Etablissement SET id = ?, nom = ?, adresseRue = ?, codePostal = ?, ville = ?, tel = ?, adresseElectronique = ?, type = ?, civiliteResponsable = ?, nomResponsable = ?, prenomResponsable = ? WHERE id='". $idMetier ."';";
+            $sql = "UPDATE etablissement SET id = ?, nom = ?, adresseRue = ?, codePostal = ?, ville = ?, tel = ?, adresseElectronique = ?, type = ?, civiliteResponsable = ?, nomResponsable = ?, prenomResponsable = ? WHERE id='". $idMetier ."';";
             // préparer la requête PDO
             $queryPrepare = Connexion::connecter()->prepare($sql);
             // exécuter la requête avec les valeurs des paramètres dans un tableau
@@ -112,7 +112,7 @@ class EtabDAO implements DAO {
     }
 
     public static function supprimerEtablissement($id) {
-        $req = "DELETE FROM Etablissement WHERE id=?";
+        $req = "DELETE FROM etablissement WHERE id=?";
         $stmt = Connexion::connecter()->prepare($req);
         $ok = $stmt->execute(array($id));
         return $ok;
@@ -121,7 +121,7 @@ class EtabDAO implements DAO {
     public static function delete($idMetier) {
         try {
             // Requête textuelle paramétrée (le paramètre est symbolisé par un ?)
-            $sql = "DELETE FROM Etablissement WHERE id = ?";
+            $sql = "DELETE FROM etablissement WHERE id = ?";
             // préparer la requête PDO
             $queryPrepare = Connexion::getPdo()->prepare($sql);
             // exécuter la requête avec les valeurs des paramètres (il n'y en a qu'un ici)
@@ -144,11 +144,11 @@ class EtabDAO implements DAO {
         // on vérifie la non existence d'un autre établissement (id!='$id') portant 
         // le même nom
         if ($mode == 'C') {
-            $req = "SELECT COUNT(*) FROM Etablissement WHERE nom=?";
+            $req = "SELECT COUNT(*) FROM etablissement WHERE nom=?";
             $stmt = $connexion->prepare($req);
             $stmt->execute(array($nom));
         } else {
-            $req = "SELECT COUNT(*) FROM Etablissement WHERE nom=? AND id<>?";
+            $req = "SELECT COUNT(*) FROM etablissement WHERE nom=? AND id<>?";
             $stmt = $connexion->prepare($req);
             $stmt->execute(array($nom, $id));
         }
@@ -158,7 +158,7 @@ class EtabDAO implements DAO {
     public static function estUnIdEtablissement($id) {
 //    global $connexion;
         $connexion = Connexion::connecter();
-        $req = "SELECT COUNT(*) FROM Etablissement WHERE id=?";
+        $req = "SELECT COUNT(*) FROM etablissement WHERE id=?";
         $stmt = $connexion->prepare($req);
         $stmt->execute(array($id));
         return $stmt->fetchColumn();
@@ -175,9 +175,9 @@ class EtabDAO implements DAO {
          * 
          */
         if ($mode == 'C') {
-            $req = "INSERT INTO Etablissement VALUES (:id, :nom, :rue, :cdp, :ville, :tel, :email, :type, :civ, :nomResp, :prenomResp)";
+            $req = "INSERT INTO etablissement VALUES (:id, :nom, :rue, :cdp, :ville, :tel, :email, :type, :civ, :nomResp, :prenomResp)";
         } else {
-            $req = "UPDATE Etablissement SET nom=:nom, adresseRue=:rue,
+            $req = "UPDATE etablissement SET nom=:nom, adresseRue=:rue,
            codePostal=:cdp, ville=:ville, tel=:tel,
            adresseElectronique=:email, type=:type,
            civiliteResponsable=:civ, nomResponsable=:nomResp, prenomResponsable=:prenomResp 
@@ -201,7 +201,7 @@ class EtabDAO implements DAO {
 
     function obtenirNbEtab() {
 //    global $connexion;
-        $req = "SELECT COUNT(*) FROM Etablissement";
+        $req = "SELECT COUNT(*) FROM etablissement";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute();
         return $stmt->fetchColumn();

@@ -1,7 +1,7 @@
 <?php
 namespace modele\dao;
 
-interface Dao {
+interface DAO {
 
     /**
      * Lire tous les enregistrements d'une table

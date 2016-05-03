@@ -4,10 +4,10 @@ namespace modele\dao;
 
 use modele\Connexion;
 use modele\metier\TypeChambre;
-use modele\dao\Dao;
+use modele\dao\DAO;
 use \PDO;
 
-class TypeChambreDAO implements Dao {
+class TypeChambreDAO implements DAO {
 
     public static function enregistrementVersObjet($enreg) {
         $retour = new TypeChambre($enreg['id'], $enreg['libelle']);
@@ -129,7 +129,7 @@ class TypeChambreDAO implements Dao {
     
 
     public static function obtenirLibelleTypeChambre($id) {
-        $req = "SELECT libelle FROM TypeChambre WHERE id = ?";
+        $req = "SELECT libelle FROM typechambre WHERE id = ?";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute(array($id));
         return $stmt->fetchColumn();
@@ -141,11 +141,11 @@ class TypeChambreDAO implements Dao {
         // sinon on vérifie la non existence d'un autre type chambre (id!='$id') 
         // ayant le même libelle
         if ($mode == 'C') {
-            $req = "SELECT COUNT(*) FROM TypeChambre WHERE libelle=:lib";
+            $req = "SELECT COUNT(*) FROM typechambre WHERE libelle=:lib";
             $stmt = Connexion::connecter()->prepare($req);
             $stmt->bindParam(':lib', $libelle);
         } else {
-            $req = "SELECT COUNT(*) FROM TypeChambre WHERE libelle=:lib and id <> :id";
+            $req = "SELECT COUNT(*) FROM typechambre WHERE libelle=:lib and id <> :id";
             $stmt = Connexion::connecter()->prepare($req);
             $stmt->bindParam(':lib', $libelle);
             $stmt->bindParam(':id', $id);
@@ -157,9 +157,9 @@ class TypeChambreDAO implements Dao {
     public static function creerModifierTypeChambre($mode, $id, $libelle) {
         $libelle = str_replace("'", "''", $libelle);
         if ($mode == 'C') {
-            $req = "INSERT INTO TypeChambre VALUES (:id, :lib)";
+            $req = "INSERT INTO typechambre VALUES (:id, :lib)";
         } else {
-            $req = "UPDATE TypeChambre SET libelle=:lib WHERE id=:id";
+            $req = "UPDATE typechambre SET libelle=:lib WHERE id=:id";
         }
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->bindParam(':id', $id);
@@ -169,14 +169,14 @@ class TypeChambreDAO implements Dao {
     }
 
     public static function estUnIdTypeChambre($id) {
-        $req = "SELECT COUNT(*) FROM TypeChambre WHERE id=?";
+        $req = "SELECT COUNT(*) FROM typechambre WHERE id=?";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute(array($id));
         return $stmt->fetchColumn();
     }
 
     public static function supprimerTypeChambre($id) {
-        $req = "DELETE FROM TypeChambre WHERE id=?";
+        $req = "DELETE FROM typechambre WHERE id=?";
         $stmt = Connexion::connecter()->prepare($req);
         $ok = $stmt->execute(array($id));
         return $ok;

@@ -4,10 +4,10 @@ namespace modele\dao;
 
 use modele\Connexion;
 use modele\metier\Offre;
-use modele\dao\Dao;
+use modele\dao\DAO;
 use \PDO;
 
-class OffreDAO implements Dao {
+class OffreDAO implements DAO {
 
     public static function enregistrementVersObjet($enreg) {
         $retour = new Offre($enreg['idEtab'], $enreg['idTypeChambre'], $enreg['nombreChambres']);
@@ -89,14 +89,14 @@ class OffreDAO implements Dao {
 
     public static function obtenirNbEtabOffrantChambres() {
 //    global $connexion;
-        $req = "SELECT COUNT(DISTINCT idEtab) FROM Offre";
+        $req = "SELECT COUNT(DISTINCT idEtab) FROM offre";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
 
     public static function obtenirIdNomEtablissements() {
-        $req = "SELECT id, nom FROM Etablissement ORDER BY id";
+        $req = "SELECT id, nom FROM etablissement ORDER BY id";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute();
         return $stmt;
@@ -104,28 +104,28 @@ class OffreDAO implements Dao {
 
     public static function obtenirNbEtab() {
 //    global $connexion;
-        $req = "SELECT COUNT(*) FROM Etablissement";
+        $req = "SELECT COUNT(*) FROM etablissement";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
 
     public static function obtenirNbTypesChambres() {
-        $req = "SELECT count(*) FROM TypeChambre";
+        $req = "SELECT count(*) FROM typechambre";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
 
     public static function obtenirDetailEtablissement($id) {
-        $req = "SELECT * FROM Etablissement WHERE id=?";
+        $req = "SELECT * FROM etablissement WHERE id=?";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->execute(array($id));
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public static function obtenirNbOffre($idEtab, $idTypeChambre) {
-        $req = "SELECT nombreChambres FROM Offre WHERE idEtab=:idEtab AND 
+        $req = "SELECT nombreChambres FROM offre WHERE idEtab=:idEtab AND 
         idTypeChambre=:idTypeCh";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->bindParam(':idEtab', $idEtab);
@@ -141,13 +141,13 @@ class OffreDAO implements Dao {
 
     public static function modifierOffreHebergement($idEtab, $idTypeChambre, $nbChambresDemandees) {
         if ($nbChambresDemandees == 0) {
-            $req = "DELETE FROM Offre WHERE idEtab=:idEtab and idTypeChambre=
+            $req = "DELETE FROM offre WHERE idEtab=:idEtab and idTypeChambre=
            :idTypeCh";
             $stmt = Connexion::connecter()->prepare($req);
             $stmt->bindParam(':idEtab', $idEtab);
             $stmt->bindParam(':idTypeCh', $idTypeChambre);
         } else {
-            $req2 = "SELECT nombreChambres FROM Offre WHERE idEtab=:idEtab AND 
+            $req2 = "SELECT nombreChambres FROM offre WHERE idEtab=:idEtab AND 
         idTypeChambre=:idTypeCh";
             $stmt2 = Connexion::connecter()->prepare($req2);
             $stmt2->bindParam(':idEtab', $idEtab);
@@ -155,10 +155,10 @@ class OffreDAO implements Dao {
             $stmt2->execute();
             $lgOffre = $stmt2->fetchColumn();
             if ($lgOffre != 0) {
-                $req = "UPDATE Offre SET nombreChambres=:nb 
+                $req = "UPDATE offre SET nombreChambres=:nb 
                 WHERE idEtab=:idEtab AND idTypeChambre=:idTypeCh";
             } else {
-                $req = "INSERT INTO Offre VALUES(:idEtab, :idTypeCh, :nb)";
+                $req = "INSERT INTO offre VALUES(:idEtab, :idTypeCh, :nb)";
             }
             $stmt = Connexion::connecter()->prepare($req);
             $stmt->bindParam(':idEtab', $idEtab);
@@ -171,7 +171,7 @@ class OffreDAO implements Dao {
 
     public static function obtenirNbOccup($idEtab, $idTypeChambre) {
         $req = "SELECT IFNULL(SUM(nombreChambres), 0) AS totalChambresOccup FROM
-        Attribution WHERE idEtab=:idEtab AND idTypeChambre=:idTypeCh";
+        attribution WHERE idEtab=:idEtab AND idTypeChambre=:idTypeCh";
         $stmt = Connexion::connecter()->prepare($req);
         $stmt->bindParam(':idEtab', $idEtab);
         $stmt->bindParam(':idTypeCh', $idTypeChambre);

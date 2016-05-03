@@ -4,10 +4,10 @@ namespace modele\dao;
 
 use modele\Connexion;
 use modele\metier\Groupe;
-use modele\dao\Dao;
+use modele\dao\DAO;
 use \PDO;
 
-class GroupeDAO implements Dao {
+class GroupeDAO implements DAO {
 
     public static function enregistrementVersObjet($enreg) {
         $retour = new Groupe($enreg['id'], $enreg['nom'], $enreg['identiteResponsable'], $enreg['adressePostale'], $enreg['nombrePersonnes'], $enreg['nomPays'], $enreg['hebergement']);
@@ -110,8 +110,8 @@ class GroupeDAO implements Dao {
     public static function delete($idMetier) {
         try {
             // Requête textuelle paramétrée (le paramètre est symbolisé par un ?)
-            $sql = "DELETE FROM Attribution WHERE idGroupe=?;";
-            $sql2 = "DELETE FROM Groupe WHERE id=?";
+            $sql = "DELETE FROM attribution WHERE idGroupe=?;";
+            $sql2 = "DELETE FROM groupe WHERE id=?";
             // préparer la requête PDO
             $queryPrepare = Connexion::connecter()->prepare($sql);
             $queryPrepare2 = Connexion::connecter()->prepare($sql2);
@@ -130,7 +130,7 @@ class GroupeDAO implements Dao {
     public static function estUnIdGroupe($id) {
 //    global $connexion;
         $connexion = Connexion::connecter();
-        $req = "SELECT COUNT(*) FROM Groupe WHERE id=?";
+        $req = "SELECT COUNT(*) FROM groupe WHERE id=?";
         $stmt = $connexion->prepare($req);
         $stmt->execute(array($id));
         return $stmt->fetchColumn();
@@ -143,11 +143,11 @@ class GroupeDAO implements Dao {
         // on vérifie la non existence d'un autre établissement (id!='$id') portant 
         // le même nom
         if ($mode == 'C') {
-            $req = "SELECT COUNT(*) FROM Groupe WHERE nom=?";
+            $req = "SELECT COUNT(*) FROM groupe WHERE nom=?";
             $stmt = Connexion::connecter()->prepare($req);
             $stmt->execute(array($nom));
         } else {
-            $req = "SELECT COUNT(*) FROM Groupe WHERE nom=? AND id<>?";
+            $req = "SELECT COUNT(*) FROM groupe WHERE nom=? AND id<>?";
             $stmt = Connexion::connecter()->prepare($req);
             $stmt->execute(array($nom, $id));
         }
@@ -186,14 +186,14 @@ class GroupeDAO implements Dao {
     }
 
     function obtenirIdNomGroupesAHeberger($connexion) {
-        $req = "SELECT id, nom FROM Groupe WHERE hebergement='O' ORDER BY id";
+        $req = "SELECT id, nom FROM groupe WHERE hebergement='O' ORDER BY id";
         $stmt = $connexion->prepare($req);
         $stmt->execute();
         return $stmt;
     }
 
     function obtenirNomGroupe($connexion, $id) {
-        $req = "SELECT nom FROM Groupe WHERE id=?";
+        $req = "SELECT nom FROM groupe WHERE id=?";
         $stmt = $connexion->prepare($req);
         $stmt->execute(array($id));
         return $stmt->fetchColumn();
