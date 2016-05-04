@@ -1,6 +1,7 @@
 <?php
 
 include("_debut.inc.php");
+require_once "_gestionErreurs.inc.php";
 
 use modele\dao\TypeChambreDAO;
 use modele\dao\OffreDAO;
@@ -55,7 +56,7 @@ for ($i = 0; $i < count($arrayTypeChambre); $i++) {
     // Si on "vient" de ce formulaire (action 'validerModifierOffre') et
     // que le nombre de chambres pour le type en question est en erreur,
     // ce nombre est affiché en erreur
-    if ($action == 'validerModifierOffre' && (!estEnstier($nbChambres[$i]) || !estModifOffreCorrecte($connexion, $idEtab, $idTypeChambre, $nbChambres[$i]))) {
+    if ($action == 'validerModifierOffre' && (!estEntier($nbChambres[$i]) || !OffreDAO::estModifOffreCorrecte($idEtab, $idTypeChambre, $nbChambres[$i]))) {
         echo "
                <td align='center'><input type='text' value='$nbChambres[$i]' 
                name='nbChambres[$i]' maxlength='3' class='erreur'></td>";

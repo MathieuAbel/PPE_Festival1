@@ -67,8 +67,7 @@ switch ($action) {
             }
         }
         if ($err) {
-            ajouterErreur(
-                    "Valeurs non entières ou inférieures aux attributions effectuées");
+            ajouterErreur("Valeurs non entières ou inférieures aux attributions effectuées");
             include("vues/OffreHebergement/vModifierOffreHebergement.php");
         } else {
             include("vues/OffreHebergement/vConsulterOffreHebergement.php");
